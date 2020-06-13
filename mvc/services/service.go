@@ -29,6 +29,7 @@ type (
 	Services struct {
 		F *M.File
 		U *M.Utils
+		T *M.Token
 	}
 )
 
@@ -36,6 +37,7 @@ func New() *Services {
 	return &Services {
 		F: M.NewFile(),
 		U: M.NewUtils(),
+		T: M.NewToken(),
 	}
 }
 

@@ -4,17 +4,14 @@ import (
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"github.com/yuw-mvc/yuw/console/crontab"
+	"github.com/yuw-mvc/yuw/console/subscribe"
 	E "github.com/yuw-mvc/yuw/exceptions"
 	M "github.com/yuw-mvc/yuw/modules"
 	R "github.com/yuw-mvc/yuw/routes"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-)
-
-const (
-	defaultPost string = "8888"
-	defaultHTMLDir string = "./resources/templates/"
 )
 
 func init() {
@@ -24,10 +21,16 @@ func init() {
 type Engine struct {
 	PoTRoutes *R.PoT
 	PoTExceptions *E.PoT
+	PoTCronTabs *crontab.PoT
+	PoTSubscribed *subscribe.PoT
 }
 
 func New() *Engine {
-	return &Engine {}
+	return &Engine {
+		PoTRoutes:     nil,
+		PoTExceptions: nil,
+		PoTSubscribed: nil,
+	}
 }
 
 func (yuw *Engine) Run() {
@@ -69,21 +72,39 @@ func (yuw *Engine) YuwInitialized() *Engine {
 		"yuw^ad_d": yuw.PoTRoutes.Rcfg == nil,
 	})
 
+	/**
+	 * Todo: Routes Initialized
+	 */
 	R.RPoT = yuw.PoTRoutes
+
+	/**
+	 * Todo: Define Exceptions
+	 */
 	E.EPoT = yuw.PoTExceptions
 	E.PoTCombine()
+
+	/**
+	 * Todo: Subscribe & Publish
+	 */
+	if yuw.PoTSubscribed != nil {
+		subscribe.Do(yuw.PoTSubscribed)
+	}
+
+	/**
+	 * Todo: CronTabs
+	 */
+	if yuw.PoTCronTabs != nil {
+		crontab.Do(yuw.PoTCronTabs)
+	}
 
 	return yuw
 }
 
 func (yuw *Engine) ginInitialized() (r *gin.Engine) {
-	/**
-	 * Todo: Log in Command
-	 */
 	gin.ForceConsoleColor()
 
-	env := cast.ToString(M.I.Env.Get("env"))
-	if env == "prd" {
+	var env string = cast.ToString(M.I.Env.Get("env"))
+	if cast.ToString(M.I.Env.Get("env")) == "prd" {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
 		gin.SetMode(gin.DebugMode)
@@ -106,8 +127,8 @@ func (yuw *Engine) ginInitialized() (r *gin.Engine) {
 	 */
 	TempStaticStatus := cast.ToBool(M.I.Get("Temp.StaticStatus", false))
 	if TempStaticStatus {
-		static := cast.ToString(M.I.Get("Temp.Static", "./resources/assets"))
-		staticIcon := cast.ToString(M.I.Get("Temp.StaticIcon", "./resources/favicon.ico"))
+		static := cast.ToString(M.I.Get("Temp.Static", defaultStatic))
+		staticIcon := cast.ToString(M.I.Get("Temp.StaticIcon", defaultStaticIcon))
 
 		r.Static("./assets", static)
 		r.StaticFile("./favicon.ico", staticIcon)
@@ -118,17 +139,17 @@ func (yuw *Engine) ginInitialized() (r *gin.Engine) {
 
 func (yuw *Engine) tplLoading(skeleton string, view string) (arrTPL []string) {
 	TplSuffix := cast.ToString(M.I.Get("Temp.Suffix", "html"))
-	dirLayout := cast.ToString(M.I.Get("Temp.DirLayout", defaultHTMLDir + "layout/"))
+	dirLayout := cast.ToString(M.I.Get("Temp.DirLayout", defaultHTMLDirLayout))
 
 	TplLayout, errLayout := filepath.Glob(dirLayout + skeleton + "." + TplSuffix)
 	E.ErrPanic(errLayout)
 
-	TplShared := cast.ToString(M.I.Get("Temp.DirShared", defaultHTMLDir + "shared/"))
+	TplShared := cast.ToString(M.I.Get("Temp.DirShared", defaultHTMLDirShared))
 
 	shareds, errShared := filepath.Glob(TplShared + skeleton + "/" + "*.html")
 	E.ErrPanic(errShared)
 
-	TplViews := cast.ToString(M.I.Get("Temp.DirViews", defaultHTMLDir + "viewer/"))
+	TplViews := cast.ToString(M.I.Get("Temp.DirViews", defaultHTMLDirViewer))
 
 	arrTPL = make([]string, 0)
 	arrTPL = append(TplLayout, TplViews + skeleton + "/" + view)

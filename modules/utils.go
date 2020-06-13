@@ -73,6 +73,15 @@ func (util *Utils) StructToMap(data interface{}) (res *gin.H, err error) {
 	return
 }
 
+func (util *Utils) JsonToMap(data []byte) (toMap map[string]interface{}) {
+	err := json.Unmarshal(data, &toMap)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func (util *Utils) StrContains(str string, src ...interface{}) (ok bool, err error) {
 	if len(src) < 1 {
 		err = E.Err("yuw^mod_util_a", E.ErrPosition())

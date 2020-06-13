@@ -42,6 +42,10 @@ func init() {
 	if YuwInitialized.Redis {
 		m.rd()
 	}
+
+	if YuwInitialized.Email {
+
+	}
 }
 
 func New() *module {

@@ -16,11 +16,11 @@ var (
 )
 
 type (
-	ErrType map[string]bool
-
 	LogMsg map[string]interface{}
 	TxTMsg map[string]interface{}
 	ErrMsg map[string]interface{}
+
+	ErrType map[string]bool
 
 	PoT struct {
 		ErrMsg *ErrMsg

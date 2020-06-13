@@ -37,6 +37,17 @@ func init() {
 		"yuw^m_rd_a": "error redis engine",
 		"yuw^m_rd_b": "redis writer error",
 		"yuw^m_rd_c": "redis reader error",
+
+		"yuw^m_fs_a": "open file error",
+
+		"yuw^m_in_a": "lost env languages configs",
+
+		"yuw^m_token_a": "empty key",
+
+		"yuw^m_email_a": "mail configure error",
+		"yuw^m_email_b": "mail send configure error",
+
+		"yuw^plugin_a": "plugins params nil",
 	}
 }
 
