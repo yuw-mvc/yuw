@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	E "github.com/yuw-mvc/yuw/exceptions"
+	"github.com/yuw-mvc/yuw/mvc/middleware"
 	"github.com/yuw-mvc/yuw/mvc/services"
 	"net/http"
 )
@@ -17,6 +18,10 @@ func New() *Controllers {
 	return &Controllers {
 		Srv: services.New(),
 	}
+}
+
+func (c *Controllers) Redirect(ctx *gin.Context, location string) {
+	middleware.Redirect(ctx, location)
 }
 
 func (c *Controllers) To(ctx *gin.Context, res *services.PoT) {

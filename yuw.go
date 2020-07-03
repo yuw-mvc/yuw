@@ -10,6 +10,7 @@ import (
 	M "github.com/yuw-mvc/yuw/modules"
 	R "github.com/yuw-mvc/yuw/routes"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strings"
 )
@@ -101,26 +102,17 @@ func (yuw *Engine) YuwInitialized() *Engine {
 }
 
 func (yuw *Engine) ginInitialized() (r *gin.Engine) {
-	gin.ForceConsoleColor()
-
-	var env string = cast.ToString(M.I.Env.Get("env"))
-	if cast.ToString(M.I.Env.Get("env")) == "prd" {
-		gin.SetMode(gin.ReleaseMode)
-	} else {
-		gin.SetMode(gin.DebugMode)
+	gin.DisableConsoleColor()
+	gin.SetMode(gin.DebugMode)
+	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+		log.Printf("[YuW] %-6s %-25s --> %s (%d handlers)", httpMethod, absolutePath, handlerName, nuHandlers)
 	}
 
 	/**
 	 * Todo: Start Routes (gin.New() | gin.Default())
 	 */
 	r = gin.New()
-	r.Use(gin.Recovery())
-
-	if env == "prd" {
-		r.Use(R.ToLoggerWithFormatter())
-	} else {
-		r.Use(gin.Logger())
-	}
+	r.Use(gin.Recovery(), R.ToLoggerWithFormatter())
 
 	/**
 	 * Todo: Configure Static Resources

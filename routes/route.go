@@ -28,7 +28,11 @@ type (
 )
 
 const YuwSp string = "->"
-var RPoT *PoT
+
+var (
+	RPoT *PoT
+	RMaP map[string]interface{} = map[string]interface{}{}
+)
 
 func To(r *gin.Engine) {
 	var exc *E.Exceptions = E.NewExceptions()
@@ -78,43 +82,16 @@ func ToFunc(tpl ...interface{}) template.FuncMap {
 }
 
 func ToLoggerWithFormatter() gin.HandlerFunc {
-	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) (strLog string) {
-		msg := E.TxTErr("yuw^m_logs_a")
-
-		if param.ErrorMessage != "" {
-			msg = param.ErrorMessage
-		}
-
-		if param.StatusCode != 200 || param.ErrorMessage != "" {
-			strLog = fmt.Sprintf(`
----------------------------------------------------------------------------------------------------
-%s » %s » %s
-%s » %s » %s » %s 
-%s » %s
-%s » %d
-%s » %s
-%s » %v
----------------------------------------------------------------------------------------------------
-`,
-				E.TxTErr("yuw^m_logs_b"),
-				param.ClientIP,
-				param.TimeStamp.Format("2006-01-02 15:04:05"),
-				E.TxTErr("yuw^m_logs_c"),
-				param.Method,
-				param.Request.Proto,
-				param.Path,
-				E.TxTErr("yuw^m_logs_d"),
-				param.Request.UserAgent(),
-				E.TxTErr("yuw^m_logs_e"),
-				param.StatusCode,
-				E.TxTErr("yuw^m_logs_f"),
-				param.Latency,
-				E.TxTErr("yuw^m_logs_g"),
-				msg,
-			)
-		}
-
-		return
+	return gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		return fmt.Sprintf("[YuW] %v |	%v |	%v |	%v |	%v |	%v(%v)\n",
+			param.TimeStamp.Format("2006/01/02 - 15:04:05"),
+			param.StatusCode,
+			param.Latency,
+			param.ClientIP,
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+		)
 	})
 }
 
@@ -125,6 +102,8 @@ func Do(g *gin.RouterGroup, toFunc map[string][]gin.HandlerFunc) {
 		if len(Y) != 3 {
 			continue
 		}
+
+		RMaP[Y[0]] = Y[2]
 
 		switch strings.ToLower(Y[1]) {
 		case "get":

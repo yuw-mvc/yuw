@@ -47,7 +47,7 @@ func init() {
 		"yuw^m_email_a": "mail configure error",
 		"yuw^m_email_b": "mail send configure error",
 
-		"yuw^plugin_a": "plugins params nil",
+		"yuw^m_admin_a": "session error",
 	}
 }
 

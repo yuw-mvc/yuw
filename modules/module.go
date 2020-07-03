@@ -14,6 +14,7 @@ type (
 		Redis bool
 		I18nT bool
 		Email bool
+		Admin bool
 	}
 
 	module struct {
@@ -45,6 +46,15 @@ func init() {
 
 	if YuwInitialized.Email {
 
+	}
+
+	if YuwInitialized.Redis && YuwInitialized.Admin {
+		E.ErrPanic(
+			m.util.MapToStruct(
+				I.Get("Session", map[string]interface{}{}).(map[string]interface{}),
+				&sessionPoT,
+			),
+		)
 	}
 }
 
@@ -124,7 +134,7 @@ func (module *module) db(timeLocation *time.Location) {
 }
 
 func (module *module) rd() {
-	rdNetwork := I.Get("Redis.Network", "").(string)
+	rdNetwork := cast.ToString(I.Get("Redis.Network", defaultRdNetworkType))
 	if ok, _ := module.util.StrContains(rdNetwork, rdNetworkType ...); ok == false {
 		rdNetwork = defaultRdNetworkType
 	}
