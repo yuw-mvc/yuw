@@ -14,6 +14,10 @@ func NewFile() *File {
 	return &File{}
 }
 
+func (fs *File) Open(pathname string) (f *os.File, err error) {
+	return os.Open(pathname)
+}
+
 func (fs *File) IsExists(pathname string) (ok bool, err error) {
 	_, err = os.Stat(pathname)
 	if err == nil {

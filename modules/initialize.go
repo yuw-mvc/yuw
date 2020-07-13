@@ -6,7 +6,9 @@ import (
 	E "github.com/yuw-mvc/yuw/exceptions"
 )
 
-const defaultType = "yaml"
+const (
+	defaultType = "yaml"
+)
 
 var (
 	I *initialize = nil
@@ -61,5 +63,9 @@ func (init *initialize) Get(key string, val interface{}) (res interface{}) {
 		res = init.Env.Get(key)
 	}
 
+	return
+}
+
+func (init *initialize) tpl() (err error) {
 	return
 }
